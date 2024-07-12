@@ -5,6 +5,16 @@
     import Timer from "./Timer.svelte";
     import Guess from "./Guess.svelte";
 
+    interface Message {
+        id?: string;
+        game: string;
+        action: string;
+        player: number;
+        guess?: string;
+        exact?: number;
+        misplaced?: number;
+    }
+
     export let socket: WebSocket;
 
     let timer = 60;
@@ -25,21 +35,27 @@
     $: canGuess = player == turn;
 
     let guess = "";
-    let currentGuesses: Array<Array<JSON>>;
-    guesses.subscribe((value) => (currentGuesses = value));
+    let currentGuesses: Array<Array<Message>>;
+    const unsubscribe = guesses.subscribe((value) => (currentGuesses = value));
 
     function submitGuess() {
         let joinMsg = {
             game: $page.params.game,
             player: player,
             action: "guess",
-            content: guess,
+            guess: guess,
         };
         socket.send(JSON.stringify(joinMsg));
         guess = "";
         // turn = 1 - turn;
         // timer = 60;
     }
+
+    onMount(() => {
+        return () => {
+            unsubscribe();
+        };
+    });
 </script>
 
 <div class="flex w-full h-screen">

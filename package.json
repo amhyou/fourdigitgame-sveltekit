@@ -13,6 +13,7 @@
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@types/qrcode": "^1.5.5",
 		"autoprefixer": "^10.4.19",
 		"daisyui": "^4.12.10",
 		"postcss": "^8.4.39",
@@ -23,5 +24,8 @@
 		"typescript": "^5.0.0",
 		"vite": "^5.0.3"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"svelte-qrcode-image": "^2.0.0-alpha.1"
+	}
 }

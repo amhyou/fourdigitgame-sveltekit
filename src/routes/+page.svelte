@@ -1,8 +1,11 @@
 <script>
     import { goto } from "$app/navigation";
 
-    function newGame() {
-        goto("/111111example");
+    async function newGame() {
+        const response = await fetch("http://localhost:8000/new");
+        const game = await response.json();
+        console.log(game);
+        goto(`/${game.id}`);
     }
 </script>
 

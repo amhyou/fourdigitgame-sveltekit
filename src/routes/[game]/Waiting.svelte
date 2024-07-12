@@ -1,8 +1,9 @@
 <script>
     import { goto } from "$app/navigation";
+    import { page } from "$app/stores";
+    import { QRCodeImage } from "svelte-qrcode-image";
 
-    let url = "https://lichess.org/hahahah";
-
+    let url = $page.url.href;
     let buttonText = "Copy";
     let buttonColor = "bg-blue-600";
 
@@ -22,20 +23,20 @@
 </script>
 
 <div
-    class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white"
+    class="flex flex-col items-center justify-around min-h-screen bg-gray-900 text-white"
 >
     <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
         <h1 class="text-2xl font-semibold mb-4">Challenge to a game</h1>
         <div class="bg-green-700 p-4 rounded-lg mb-4">
             <div class="text-xl font-bold">Blitz</div>
-            <div class="text-lg">5+3</div>
-            <div class="text-sm mt-2">Custom rules:</div>
+            <div class="text-lg">60 seconds per guess</div>
+            <!-- <div class="text-sm mt-2">Custom rules:</div>
             <div class="text-sm mt-1">Random side</div>
-            <div class="text-sm">Casual</div>
+            <div class="text-sm">Casual</div> -->
         </div>
         <div class="flex flex-col md:flex-row items-center justify-around">
             <div
-                class="mb-4 md:mb-0 w-full md:w-1/2 flex flex-col items-center"
+                class="mb-4 md:mb-0 w-full md:w-2/3 flex flex-col items-center"
             >
                 <div class="text-sm mb-2">
                     To invite someone to play, give this URL
@@ -62,11 +63,7 @@
                 <div class="text-sm mb-2">
                     Or let your opponent scan this QR code
                 </div>
-                <img
-                    src="https://static.vecteezy.com/system/resources/previews/002/557/391/original/qr-code-for-scanning-free-vector.jpg"
-                    alt="QR Code"
-                    class="w-32 h-32"
-                />
+                <QRCodeImage text={url} displayClass="w-2/3" />
             </div>
         </div>
         <button

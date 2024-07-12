@@ -19,6 +19,8 @@
             />
         </svg>
     </div>
-    <div class="timeline-end timeline-box">{guessMessage.content} => 1T 1M</div>
+    <div class="timeline-end timeline-box">
+        {guessMessage.guess} => {guessMessage.exact}T {guessMessage.misplaced}M
+    </div>
     <hr />
 </li>
