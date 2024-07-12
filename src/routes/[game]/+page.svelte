@@ -27,7 +27,7 @@
     let interval: NodeJS.Timeout;
 
     onMount(() => {
-        socket = new WebSocket("ws://localhost:8000/start");
+        socket = new WebSocket("wss://fourdigitgame.amhyou.com/start");
 
         socket.addEventListener("open", () => {
             console.log("Connected to WebSocket server");

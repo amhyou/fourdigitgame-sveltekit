@@ -2,7 +2,7 @@
     import { goto } from "$app/navigation";
 
     async function newGame() {
-        const response = await fetch("http://localhost:8000/new");
+        const response = await fetch("https://fourdigitgame.amhyou.com/new");
         const game = await response.json();
         console.log(game);
         goto(`/${game.id}`);
