@@ -16,29 +16,20 @@
     }
 
     export let socket: WebSocket;
-
-    let timer = 60;
-    // let interval: number;
-    // onMount(() => {
-    //     interval = setInterval(() => {
-    //         if (timer > 0) {
-    //             timer--;
-    //         } else {
-    //             clearInterval(interval);
-    //         }
-    //         console.log(timer);
-    //     }, 1000);
-    // });
-
+    export let timer: number;
     export let player: number;
     export let turn: number = 0;
-    $: canGuess = player == turn;
+    $: myGuess = player == turn;
+    $: yourGuess = 1 - player == turn;
 
     let guess = "";
     let currentGuesses: Array<Array<Message>>;
     const unsubscribe = guesses.subscribe((value) => (currentGuesses = value));
 
     function submitGuess() {
+        if (guess.length != 4 || !isvalidGuess) {
+            return;
+        }
         let joinMsg = {
             game: $page.params.game,
             player: player,
@@ -47,8 +38,6 @@
         };
         socket.send(JSON.stringify(joinMsg));
         guess = "";
-        // turn = 1 - turn;
-        // timer = 60;
     }
 
     onMount(() => {
@@ -56,13 +45,19 @@
             unsubscribe();
         };
     });
+
+    $: uniqueDigits = new Set(guess);
+    $: isvalidGuess =
+        /^\d*$/.test(guess) &&
+        guess.length < 5 &&
+        guess.length == uniqueDigits.size;
 </script>
 
 <div class="flex w-full h-screen">
     <div
         class="card bg-base-300 rounded-box h-full flex-grow place-items-center flex flex-col space-y-6"
     >
-        <Timer timeLeft={timer} starting={canGuess} />
+        <Timer timeLeft={timer} starting={myGuess} />
 
         <div class="join">
             <input
@@ -73,11 +68,12 @@
                 maxlength="4"
                 type="text"
                 placeholder="*** write your guess"
-                disabled={!canGuess}
+                disabled={yourGuess}
+                class:input-error={!isvalidGuess}
             />
             <button
                 class="btn join-item rounded-r-full btn-accent btn-outline"
-                disabled={!canGuess}
+                disabled={yourGuess}
                 on:click={submitGuess}>Guess</button
             >
         </div>
@@ -92,7 +88,7 @@
     <div
         class="card bg-base-300 rounded-box h-full flex-grow place-items-center flex flex-col space-y-6"
     >
-        <Timer timeLeft={timer} starting={canGuess} />
+        <Timer timeLeft={timer} starting={yourGuess} />
 
         <input
             type="text"

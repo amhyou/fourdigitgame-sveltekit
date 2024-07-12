@@ -23,6 +23,8 @@
     let lastMessage: Message;
     let gameStatus: string;
     let error: boolean = false;
+    let timer: number = 60;
+    let interval: NodeJS.Timeout;
 
     onMount(() => {
         socket = new WebSocket("ws://localhost:8000/start");
@@ -48,10 +50,25 @@
                 case "start":
                     status = "ongoing";
                     console.log(player);
+                    interval = setInterval(() => {
+                        if (timer > 0) {
+                            timer--;
+                        } else {
+                            clearInterval(interval);
+                            let stopMsg = {
+                                game: $page.params.game,
+                                player: 1 - turn,
+                                action: "stop",
+                                reason: "lost on time",
+                            };
+                            socket.send(JSON.stringify(stopMsg));
+                        }
+                        console.log(timer);
+                    }, 1000);
                     break;
                 case "guess":
                     guesses.update((val: Array<Array<Message>>) => {
-                        if (message.player == 1) {
+                        if (message.player == 1 && player == 1) {
                             if (lastMessage.exact == 4 && message.exact != 4) {
                                 // player 1 wins
                                 let stopMsg = {
@@ -93,9 +110,9 @@
                     });
                     turn = 1 - message.player;
                     console.log(message.player);
+                    timer = 60;
                     break;
                 case "stop":
-                    status = "ended";
                     if (message.player == player) {
                         gameStatus = "Congratulations! You WON";
                     } else if (message.player == 1 - player) {
@@ -103,8 +120,12 @@
                     } else {
                         gameStatus = "Tie !";
                     }
+                    turn = 2;
+                    status = "ended";
                     break;
                 case "notfound":
+                    turn = 2;
+                    status = "ended";
                     error = true;
                     break;
                 default:
@@ -114,11 +135,18 @@
 
         socket.addEventListener("close", () => {
             console.log("Disconnected from WebSocket server");
+            socket.close();
+            clearInterval(interval);
         });
 
         return () => {
             socket.close();
+            clearInterval(interval);
         };
+    });
+
+    onDestroy(() => {
+        clearInterval(interval);
     });
 </script>
 
@@ -127,8 +155,8 @@
 {:else if status == "start"}
     <Waiting />
 {:else}
-    <Game {player} {socket} {turn} />
-    <dialog id="my_modal_2" class="modal" class:modal-open={status == "ended"}>
+    <Game {player} {socket} {turn} {timer} />
+    <dialog class="modal" class:modal-open={status == "ended"}>
         <div class="modal-box">
             <h3 class="text-lg font-bold">{gameStatus}</h3>
             <p class="py-4">Game is in continuous improvements</p>
